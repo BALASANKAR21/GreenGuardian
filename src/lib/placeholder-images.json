@@ -1,0 +1,112 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-1",
+      "description": "A lush urban balcony garden at sunset.",
+      "imageUrl": "https://images.unsplash.com/photo-1610241436127-fabb1726a33f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8dXJiYW4lMjBnYXJkZW58ZW58MHx8fHwxNzYwNzU1NzUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "urban garden"
+    },
+    {
+      "id": "login-bg",
+      "description": "A bright and airy room with many houseplants.",
+      "imageUrl": "https://images.unsplash.com/photo-1604762524889-3e2fcc145683?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxpbmRvb3IlMjBwbGFudHN8ZW58MHx8fHwxNzYwNzYwMzg4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indoor plants"
+    },
+    {
+      "id": "map-placeholder",
+      "description": "A stylized map showing streets and green areas.",
+      "imageUrl": "https://images.unsplash.com/photo-1717700299581-c2fc3fad4ee8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjaXR5JTIwbWFwfGVufDB8fHx8MTc2MDczMTI4N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city map"
+    },
+    {
+      "id": "plant-monstera",
+      "description": "A healthy Monstera Deliciosa plant.",
+      "imageUrl": "https://images.unsplash.com/photo-1545165375-1b744b9ed444?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtb25zdGVyYSUyMHBsYW50fGVufDB8fHx8MTc2MDczMTQ5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "monstera plant"
+    },
+    {
+      "id": "plant-snake",
+      "description": "A tall Sansevieria (snake plant).",
+      "imageUrl": "https://images.unsplash.com/photo-1613498630970-f2a333cb4974?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c25ha2UlMjBwbGFudHxlbnwwfHx8fDE3NjA3MzE0OTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "snake plant"
+    },
+    {
+      "id": "plant-fiddle-leaf",
+      "description": "A Fiddle Leaf Fig tree in a pot.",
+      "imageUrl": "https://images.unsplash.com/photo-1652047032006-c24e51f31267?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmaWRkbGUtbGVhZiUyMGZpZ3xlbnwwfHx8fDE3NjA3MzE0OTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fiddle-leaf fig"
+    },
+    {
+      "id": "plant-zz",
+      "description": "A Zamioculcas zamiifolia (ZZ) plant.",
+      "imageUrl": "https://images.unsplash.com/photo-1636624477441-87988d54e932?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8WlolMjBwbGFudHxlbnwwfHx8fDE3NjA3NzQxMzJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ZZ plant"
+    },
+    {
+      "id": "plant-pothos",
+      "description": "A trailing Golden Pothos plant.",
+      "imageUrl": "https://images.unsplash.com/photo-1747156198758-e12dfd4fe7ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwb3Rob3MlMjBwbGFudHxlbnwwfHx8fDE3NjA3MzE0OTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "pothos plant"
+    },
+    {
+      "id": "plant-spider",
+      "description": "A Spider Plant with many plantlets.",
+      "imageUrl": "https://images.unsplash.com/photo-1642764264024-c57055fb0bb3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxzcGlkZXIlMjBwbGFudHxlbnwwfHx8fDE3NjA3MzE0OTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "spider plant"
+    },
+    {
+      "id": "vlog-1",
+      "description": "A person potting a small plant.",
+      "imageUrl": "https://images.unsplash.com/photo-1636039479790-be1d880e2b8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwb3R0aW5nJTIwcGxhbnR8ZW58MHx8fHwxNzYwNzc0MTMyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "potting plant"
+    },
+    {
+      "id": "vlog-2",
+      "description": "A collection of succulents on a windowsill.",
+      "imageUrl": "https://images.unsplash.com/photo-1679273537083-afb431197d4a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzdWNjdWxlbnQlMjBjb2xsZWN0aW9ufGVufDB8fHx8MTc2MDc3NDEzMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "succulent collection"
+    },
+    {
+      "id": "vlog-3",
+      "description": "A person watering their indoor garden.",
+      "imageUrl": "https://images.unsplash.com/photo-1724556295094-62d093eddd87?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx3YXRlcmluZyUyMHBsYW50c3xlbnwwfHx8fDE3NjA3NzA0MzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "watering plants"
+    },
+    {
+      "id": "vlog-4",
+      "description": "Close up of fresh green leaves with water droplets.",
+      "imageUrl": "https://images.unsplash.com/photo-1524055988636-436cfa46e59e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxncmVlbiUyMGxlYXZlc3xlbnwwfHx8fDE3NjA3MzEzNjd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "green leaves"
+    },
+    {
+      "id": "product-tools",
+      "description": "A set of small gardening tools.",
+      "imageUrl": "https://images.unsplash.com/photo-1597764983031-60a74afb8692?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxnYXJkZW5pbmclMjB0b29sc3xlbnwwfHx8fDE3NjA3MzQyMzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "gardening tools"
+    },
+    {
+      "id": "product-gloves",
+      "description": "A pair of durable gardening gloves.",
+      "imageUrl": "https://images.unsplash.com/photo-1665395131262-c2df665c2cbe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxnYXJkZW5pbmclMjBnbG92ZXN8ZW58MHx8fHwxNzYwNzY0ODI5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "gardening gloves"
+    },
+    {
+      "id": "product-pot",
+      "description": "A stylish ceramic pot for plants.",
+      "imageUrl": "https://images.unsplash.com/photo-1644329143625-102b6cb510b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxjZXJhbWljJTIwcG90fGVufDB8fHx8MTc2MDc1ODk1Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ceramic pot"
+    },
+    {
+      "id": "product-soil",
+      "description": "A bag of premium potting soil mix.",
+      "imageUrl": "https://images.unsplash.com/photo-1642952273588-ed6fa28870ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwb3R0aW5nJTIwc29pbHxlbnwwfHx8fDE3NjA3Nzk1NzZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "potting soil"
+    },
+    {
+      "id": "vlog-hero",
+      "description": "A person writing in a journal surrounded by plants.",
+      "imageUrl": "https://images.unsplash.com/photo-1598646470058-34b001098987?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx3cml0aW5nJTIwcGxhbnRzfGVufDB8fHx8MTc2MDc3OTU3N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "writing plants"
+    }
+  ]
+}
