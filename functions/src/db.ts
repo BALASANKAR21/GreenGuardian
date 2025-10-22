@@ -1,11 +1,15 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, Db } from "mongodb";
 import * as functions from "firebase-functions";
 
 const uri = functions.config().mongodb?.uri || process.env.MONGODB_URI;
-const client = new MongoClient(uri!);
-let cachedDb: any = null;
+if (!uri) {
+  throw new Error("MongoDB URI is not configured");
+}
 
-export async function getDb() {
+const client = new MongoClient(uri);
+let cachedDb: Db | null = null;
+
+export async function getDb(): Promise<Db> {
   if (!cachedDb) {
     await client.connect();
     cachedDb = client.db("greenguardian");

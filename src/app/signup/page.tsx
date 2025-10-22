@@ -16,6 +16,7 @@ export default function SignupPage() {
   const bgImage = PlaceHolderImages.find((img) => img.id === 'login-bg');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -26,7 +27,29 @@ export default function SignupPage() {
     setLoading(true);
     try {
       const auth = getAuth(app);
-      await createUserWithEmailAndPassword(auth, email, password);
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+      // get token for backend auth
+      const token = await cred.user.getIdToken();
+
+      const formData = new FormData();
+      formData.append('displayName', displayName || '');
+      formData.append('email', email);
+      formData.append('username', (displayName || email).replace(/\s+/g, '').toLowerCase());
+
+      const avatarInput = document.getElementById('avatar') as HTMLInputElement | null;
+      if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+        formData.append('avatar', avatarInput.files[0]);
+      }
+
+      await fetch('/api/users/register', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       router.push('/dashboard');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -54,6 +77,10 @@ export default function SignupPage() {
             <CardContent>
               <form className="grid gap-4" onSubmit={handleSignup}>
                 <div className="grid gap-2">
+                  <Label htmlFor="displayName">Full name</Label>
+                  <Input id="displayName" value={displayName} onChange={e => setDisplayName(e.target.value)} />
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input id="email" type="email" placeholder="m@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
                 </div>
@@ -61,6 +88,10 @@ export default function SignupPage() {
                   <Label htmlFor="password">Password</Label>
                   <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
                 </div>
+                <label className="block mb-2">
+                  <span className="text-sm">Profile image (optional)</span>
+                  <input id="avatar" type="file" accept="image/*" className="mt-1" />
+                </label>
                 {error && <div className="text-red-500 text-sm text-center">{error}</div>}
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Signing up...' : 'Sign Up'}

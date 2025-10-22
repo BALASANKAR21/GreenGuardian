@@ -1,0 +1,111 @@
+=== GreenGuardian Demo Report ===
+Generated: Wed Oct 22 12:00:26 IST 2025
+
+Environment:
+MongoDB URI: mongodb+srv://yrrr83632_db_user:FNYh4hZrAuSWR0XL@greenguardian.ozndg2y.mongodb.net/?retryWrites=true&w=majority&appName=greenguardian
+Firebase Project: greenguardian-1b7df
+
+Services:
+- Functions emulator: http://localhost:5001/greenguardian-1b7df/us-central1/api
+- Next.js: http://localhost:9002
+
+Database Inspection:
+Connected to MongoDB
+Databases:
+ - greenguardian (sizeBytes: 73728)
+ - test (sizeBytes: 73728)
+ - admin (sizeBytes: 368640)
+ - local (sizeBytes: 7279017984)
+---
+DB: greenguardian - collections: plants
+
+  collection plants - 1 document(s)
+   sample doc: {
+  _id: new ObjectId('68f8736efed6513451ab8826'),
+  name: 'Test Plant',
+  scientificName: 'Plantae testus',
+  createdAt: 2025-10-22T06:02:22.207Z
+}
+---
+DB: test - collections: users
+
+  collection users - 1 document(s)
+   sample doc: {
+  _id: new ObjectId('68f3cd23140fe4600b54ea73'),
+  userId: 'testUser123',
+  name: 'Test User',
+  email: 'test@example.com',
+  username: 'testuser',
+  location: 'Test City',
+  profilePicture: ''
+}
+---
+greenguardian.plants: 1
+ sample: {
+  _id: new ObjectId('68f8736efed6513451ab8826'),
+  name: 'Test Plant',
+  scientificName: 'Plantae testus',
+  createdAt: 2025-10-22T06:02:22.207Z
+}
+
+Functions Log Tail:
+i  emulators: Starting emulators: functions
+⚠  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect
+i  functions: Watching "/Users/balasankar/Downloads/GreenGuardian/functions/functions" for Cloud Functions...
+⬢  functions: Failed to load function definition from source: FirebaseError: could not deploy functions because the "functions" directory was not found. Please create it or specify a different source directory in firebase.json
+
+[90m┌─────────────────────────────────────────────────────────────┐[39m
+[90m│[39m ✔  All emulators ready! It is now safe to connect your app. [90m│[39m
+[90m│[39m i  View Emulator UI at http://127.0.0.1:4000/               [90m│[39m
+[90m└─────────────────────────────────────────────────────────────┘[39m
+
+[90m┌───────────[39m[90m┬────────────────[39m[90m┬─────────────────────────────────┐[39m
+[90m│[39m[33m Emulator  [39m[90m│[39m[33m Host:Port      [39m[90m│[39m[33m View in Emulator UI             [39m[90m│[39m
+[90m├───────────[39m[90m┼────────────────[39m[90m┼─────────────────────────────────┤[39m
+[90m│[39m Functions [90m│[39m 127.0.0.1:5001 [90m│[39m http://127.0.0.1:4000/functions [90m│[39m
+[90m└───────────[39m[90m┴────────────────[39m[90m┴─────────────────────────────────┘[39m
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+
+Next.js Log Tail:
+> nextn@0.1.0 dev
+> next dev --turbopack -p 9002
+
+ ⚠ The config property `experimental.turbo` is deprecated. Move this setting to `config.turbopack` or run `npx @next/codemod@latest next-experimental-turbo-to-turbopack .`
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/balasankar/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/balasankar/Downloads/GreenGuardian/package-lock.json
+
+   ▲ Next.js 15.5.6 (Turbopack)
+   - Local:        http://localhost:9002
+   - Network:      http://192.168.10.4:9002
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · turbo
+
+ ✓ Starting...
+ ✓ Ready in 672ms
+
+Quick Demo Steps:
+1. Open http://localhost:9002 in your browser
+2. Sign in using Firebase Authentication
+3. View profile, garden, or environmental data
+4. Check MongoDB collections in Atlas or local DB
+
+Stack Features:
+- Next.js frontend with Tailwind CSS
+- Firebase Functions API with TypeScript
+- MongoDB database (Atlas or local)
+- Firebase Authentication
+- Real-time environmental data
+- Garden management
+- Plant identification
+
+To stop the demo:
+kill 10581 10582

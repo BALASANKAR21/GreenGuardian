@@ -1,0 +1,22 @@
+
+> nextn@0.1.0 dev
+> next dev --turbopack -p 9002
+
+ ⚠ The config property `experimental.turbo` is deprecated. Move this setting to `config.turbopack` or run `npx @next/codemod@latest next-experimental-turbo-to-turbopack .`
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/balasankar/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/balasankar/Downloads/GreenGuardian/package-lock.json
+
+   ▲ Next.js 15.5.6 (Turbopack)
+   - Local:        http://localhost:9002
+   - Network:      http://192.168.10.4:9002
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · turbo
+
+ ✓ Starting...
+ ✓ Ready in 672ms
+[?25h

@@ -9,8 +9,30 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    // This is to allow cross-origin requests from the Firebase Studio preview environment.
-    allowedDevOrigins: ['https://*.cloudworkstations.dev'],
+    turbo: {
+      rules: {
+        // Configure rules for Turbopack
+        server: ['express']
+      }
+    }
+  },
+  // Set the project root for Turbopack
+  distDir: '.next',
+  // Configure allowed origins for development
+  headers: async () => {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: process.env.NODE_ENV === 'development' 
+              ? 'http://192.168.10.4:9002' 
+              : 'https://*.cloudworkstations.dev',
+          },
+        ],
+      },
+    ];
   },
   images: {
     remotePatterns: [

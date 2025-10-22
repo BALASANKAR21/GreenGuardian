@@ -24,59 +24,132 @@ function ProfilePage() {
   const auth = getAuth(app);
   const userId = auth.currentUser?.uid;
 
-  const [userData, setUserData] = useState({
-    name: "",
-    email: "",
-    username: "",
-    location: "",
+  const DEFAULT_USER = {
+    name: "bala sankar",
+    email: auth.currentUser?.email || "balasankar21@gmail.com",
+    username: "balasankar",
+    location: "Vellore, India",
     profilePicture: "",
+  };
+
+  const [userData, setUserData] = useState({
+    name: DEFAULT_USER.name,
+    email: DEFAULT_USER.email,
+    username: DEFAULT_USER.username,
+    location: DEFAULT_USER.location,
+    profilePicture: DEFAULT_USER.profilePicture,
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch user data from backend
+  // Fetch user data from backend — with safe defaults on any failure or empty response
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      // No user signed in — ensure defaults are visible
+      setUserData({
+        name: DEFAULT_USER.name,
+        email: DEFAULT_USER.email,
+        username: DEFAULT_USER.username,
+        location: DEFAULT_USER.location,
+        profilePicture: DEFAULT_USER.profilePicture,
+      });
+      return;
+    }
+
+    let cancelled = false;
 
     const fetchUser = async () => {
       try {
-        const res = await fetch(`/api/users/${userId}`);
-        if (res.ok) {
-          const data = await res.json();
-          setUserData({
-            name: data.name || "",
-            email: data.email || auth.currentUser?.email || "",
-            username: data.username || "",
-            location: data.location || "",
-            profilePicture: data.profilePicture || "",
-          });
-        } else {
+        const token = await auth.currentUser?.getIdToken();
+        const res = await fetch(`/api/v1/profile`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+
+        if (!res.ok) {
+          // set defaults if non-OK
+          if (!cancelled)
+            setUserData({
+              name: DEFAULT_USER.name,
+              email: DEFAULT_USER.email,
+              username: DEFAULT_USER.username,
+              location: DEFAULT_USER.location,
+              profilePicture: DEFAULT_USER.profilePicture,
+            });
+
           toast({
             title: "Error",
             description: "Failed to fetch user data. Showing defaults.",
             variant: "destructive",
           });
+          return;
         }
-      } catch {
+
+        const json = await res.json();
+        const data = json?.data || json?.user || json || {};
+
+        // If response is empty / missing critical fields, merge with defaults
+        const merged = {
+          name: data.name || DEFAULT_USER.name,
+          email: data.email || auth.currentUser?.email || DEFAULT_USER.email,
+          username: data.username || DEFAULT_USER.username,
+          location: data.location || DEFAULT_USER.location,
+          profilePicture: data.profilePicture || DEFAULT_USER.profilePicture,
+        };
+
+        if (!cancelled) setUserData(merged);
+      } catch (e) {
+        if (!cancelled)
+          setUserData({
+            name: DEFAULT_USER.name,
+            email: DEFAULT_USER.email,
+            username: DEFAULT_USER.username,
+            location: DEFAULT_USER.location,
+            profilePicture: DEFAULT_USER.profilePicture,
+          });
+
         toast({
           title: "Error",
-          description: "Failed to fetch user data. Showing defaults.",
+          description:
+            e instanceof Error
+              ? e.message
+              : "Failed to fetch user data. Showing defaults.",
           variant: "destructive",
         });
       }
     };
 
     fetchUser();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+
+  // Clean up object URL previews to avoid memory leaks
+  useEffect(() => {
+    return () => {
+      if (userData.profilePicture && userData.profilePicture.startsWith("blob:")) {
+        URL.revokeObjectURL(userData.profilePicture);
+      }
+    };
+  }, [userData.profilePicture]);
 
   // Handle profile picture selection
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+
+      // revoke previous blob url if any
+      if (userData.profilePicture && userData.profilePicture.startsWith("blob:")) {
+        URL.revokeObjectURL(userData.profilePicture);
+      }
+
+      const previewUrl = URL.createObjectURL(file);
       setImageFile(file);
       setUserData((prev) => ({
         ...prev,
-        profilePicture: URL.createObjectURL(file), // preview
+        profilePicture: previewUrl, // preview
       }));
     }
   };
@@ -91,23 +164,29 @@ function ProfilePage() {
 
       // Upload new image if selected
       if (imageFile) {
+        const token = await auth.currentUser?.getIdToken();
         const formData = new FormData();
         formData.append("profilePicture", imageFile);
 
-        const uploadRes = await fetch(`/api/users/${userId}/upload`, {
+        const uploadRes = await fetch(`/api/v1/profile/upload`, {
           method: "POST",
           body: formData,
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
 
         if (!uploadRes.ok) throw new Error("Image upload failed");
         const uploadData = await uploadRes.json();
-        profilePictureUrl = uploadData.url;
+        profilePictureUrl = uploadData.url || uploadData?.data?.url || profilePictureUrl;
       }
 
       // Update user info
-      const res = await fetch(`/api/users/${userId}`, {
+      const token = await auth.currentUser?.getIdToken();
+      const res = await fetch(`/api/v1/profile`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           name: userData.name,
           username: userData.username,
@@ -170,7 +249,8 @@ function ProfilePage() {
             <Avatar className="h-20 w-20">
               <AvatarImage
                 src={
-                  userData.profilePicture || "https://i.pravatar.cc/150?u=default"
+                  userData.profilePicture ||
+                  "https://images.icon-icons.com/2483/PNG/512/user_icon_149851.png"
                 }
                 alt={userData.name || "User"}
               />

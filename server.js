@@ -5,12 +5,26 @@ import multer from "multer";
 import admin from "firebase-admin";
 import dotenv from "dotenv";
 import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
 
 // Initialize Firebase Admin
-import serviceAccount from "./firebase-service-account.json" assert { type: "json" };
+let serviceAccount;
+try {
+  const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH || path.join(__dirname, 'firebase-service-account.json');
+  serviceAccount = JSON.parse(await import('fs').then(fs => fs.promises.readFile(serviceAccountPath, 'utf8')));
+} catch (error) {
+  console.error('Error loading Firebase service account:', error);
+  process.exit(1);
+}
 
+// Initialize Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   storageBucket: process.env.FIREBASE_BUCKET,
@@ -18,9 +32,18 @@ admin.initializeApp({
 
 const bucket = admin.storage().bucket();
 
+// Create Express app
 const app = express();
-app.use(cors());
+
+// Middleware
+app.use(cors({
+  origin: process.env.NODE_ENV === 'development' 
+    ? ['http://localhost:9002', 'http://192.168.10.4:9002'] 
+    : process.env.ALLOWED_ORIGINS?.split(','),
+  credentials: true
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
@@ -61,6 +84,48 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // -------- Routes -------- //
+
+// POST register: client creates Firebase user (client SDK) then calls this to create profile + optional avatar
+app.post('/api/users/register', verifyToken, upload.single('avatar'), async (req, res) => {
+  try {
+    const uid = req.userId;
+    const { displayName, email, username } = req.body;
+
+    let profilePictureUrl = undefined;
+    if (req.file) {
+      const fileName = `profilePictures/${uid}${path.extname(req.file.originalname)}`;
+      const file = bucket.file(fileName);
+      const stream = file.createWriteStream({ metadata: { contentType: req.file.mimetype } });
+      stream.end(req.file.buffer);
+      await new Promise((resolve, reject) => {
+        stream.on('finish', resolve);
+        stream.on('error', reject);
+      });
+      await file.makePublic();
+      profilePictureUrl = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
+    }
+
+    const user = await User.findOneAndUpdate(
+      { userId: uid },
+      {
+        $set: {
+          userId: uid,
+          name: displayName || '',
+          email: email || '',
+          username: username || '',
+          profilePicture: profilePictureUrl || undefined,
+        }
+      },
+      { new: true, upsert: true }
+    );
+
+    res.status(201).json({ user: user, profilePicture: profilePictureUrl });
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json({ message: err.message || String(err) });
+  }
+});
+
 
 // GET user info
 app.get("/api/users/:userId", verifyToken, async (req, res) => {
