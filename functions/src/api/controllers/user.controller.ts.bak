@@ -1,0 +1,410 @@
+import { Request, Response } from 'express';import { Request, Response } from 'express';import type { Request, Response } from 'express';import { Request, Response } from 'express';
+
+import { UserService } from '../../services/user.service';
+
+import { AppError } from '../../lib/errors';import { UserService } from '../../services/user.service';
+
+import { UserInput } from '../../models/user.model';
+
+import { StatusCodes } from 'http-status-codes';import { AppError } from '../../lib/errors';import { MongoUserRepository } from '../../infrastructure/repositories/MongoUserRepository';import { RepositoryFactory } from '../../infrastructure/repositories/RepositoryFactory';
+
+
+
+export class UserController {import { UserDocument, UserInput } from '../../models/user.model';
+
+  private userService: UserService;
+
+import { StatusCodes } from 'http-status-codes';import { IUserProfile } from '../../domain/interfaces/IUserProfile';import { AppError } from '../middleware/error-handler';
+
+  constructor() {
+
+    this.userService = new UserService();
+
+  }
+
+export class UserController {import { User } from '../../domain/entities/User';
+
+  public async createUser(req: Request, res: Response): Promise<void> {
+
+    try {  private userService: UserService;
+
+      const userData: UserInput = req.body;
+
+      const user = await this.userService.createUser(userData);const userRepo = new MongoUserRepository();
+
+      res.status(StatusCodes.CREATED).json(user);
+
+    } catch (error) {  constructor() {
+
+      if (error instanceof AppError) {
+
+        res.status(error.statusCode).json({ error: error.message });    this.userService = new UserService();export const userController = {
+
+      } else {
+
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });  }
+
+      }
+
+    }export class AppError extends Error {  async getProfile(req: Request, res: Response) {
+
+  }
+
+  public createUser = async (req: Request, res: Response): Promise<void> => {
+
+  public async getUser(req: Request, res: Response): Promise<void> {
+
+    try {    try {  constructor(message: string, public readonly statusCode: number = 500) {    try {
+
+      const userId = req.params.id;
+
+      const user = await this.userService.getUserById(userId);      const userData: UserInput = req.body;
+
+      if (!user) {
+
+        res.status(StatusCodes.NOT_FOUND).json({ error: 'User not found' });      const user = await this.userService.createUser(userData);    super(message);      const { uid } = (req as any).user;
+
+        return;
+
+      }      res.status(StatusCodes.CREATED).json(user);
+
+      res.status(StatusCodes.OK).json(user);
+
+    } catch (error) {    } catch (error) {    this.name = 'AppError';      const userRepo = RepositoryFactory.getUserRepository();
+
+      if (error instanceof AppError) {
+
+        res.status(error.statusCode).json({ error: error.message });      if (error instanceof AppError) {
+
+      } else {
+
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });        res.status(error.statusCode).json({ error: error.message });  }      const profile = await userRepo.findByUid(uid);
+
+      }
+
+    }      } else {
+
+  }
+
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });}      
+
+  public async updateUser(req: Request, res: Response): Promise<void> {
+
+    try {      }
+
+      const userId = req.params.id;
+
+      const updateData = req.body;    }      if (!profile) {
+
+      const updatedUser = await this.userService.updateUser(userId, updateData);
+
+      if (!updatedUser) {  };
+
+        res.status(StatusCodes.NOT_FOUND).json({ error: 'User not found' });
+
+        return;export async function getUserProfile(req: Request, res: Response): Promise<void> {        throw new AppError('Profile not found', 404, 'PROFILE_NOT_FOUND');
+
+      }
+
+      res.status(StatusCodes.OK).json(updatedUser);  public getUser = async (req: Request, res: Response): Promise<void> => {
+
+    } catch (error) {
+
+      if (error instanceof AppError) {    try {  try {      }
+
+        res.status(error.statusCode).json({ error: error.message });
+
+      } else {      const userId = req.params.id;
+
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
+
+      }      const user = await this.userService.getUserById(userId);    const { uid } = req.params;      
+
+    }
+
+  }      if (!user) {
+
+
+
+  public async deleteUser(req: Request, res: Response): Promise<void> {        res.status(StatusCodes.NOT_FOUND).json({ error: 'User not found' });    if (!uid) {      // Remove sensitive information
+
+    try {
+
+      const userId = req.params.id;        return;
+
+      const deleted = await this.userService.deleteUser(userId);
+
+      if (!deleted) {      }      throw new AppError('User ID is required', 400);      const { password, ...safeProfile } = profile;
+
+        res.status(StatusCodes.NOT_FOUND).json({ error: 'User not found' });
+
+        return;      res.status(StatusCodes.OK).json(user);
+
+      }
+
+      res.status(StatusCodes.NO_CONTENT).send();    } catch (error) {    }      
+
+    } catch (error) {
+
+      if (error instanceof AppError) {      if (error instanceof AppError) {
+
+        res.status(error.statusCode).json({ error: error.message });
+
+      } else {        res.status(error.statusCode).json({ error: error.message });      res.json({
+
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
+
+      }      } else {
+
+    }
+
+  }        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });    const profile = await userRepo.getById(uid);        status: 'success',
+
+}
+      }
+
+    }    if (!profile) {        data: safeProfile
+
+  };
+
+      res.status(404).json({ message: 'User profile not found' });      });
+
+  public updateUser = async (req: Request, res: Response): Promise<void> => {
+
+    try {      return;    } catch (error) {
+
+      const userId = req.params.id;
+
+      const updateData = req.body;    }      if (error instanceof AppError) {
+
+      const updatedUser = await this.userService.updateUser(userId, updateData);
+
+      res.status(StatusCodes.OK).json(updatedUser);        throw error;
+
+    } catch (error) {
+
+      if (error instanceof AppError) {    res.json(profile);      }
+
+        res.status(error.statusCode).json({ error: error.message });
+
+      } else {  } catch (error) {      throw new AppError('Failed to get profile', 500, 'FETCH_ERROR');
+
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
+
+      }    const statusCode = error instanceof AppError ? error.statusCode : 500;    }
+
+    }
+
+  };    const message = error instanceof Error ? error.message : 'An unexpected error occurred';  },
+
+
+
+  public deleteUser = async (req: Request, res: Response): Promise<void> => {    res.status(statusCode).json({ error: message });
+
+    try {
+
+      const userId = req.params.id;  }  async updateProfile(req: Request, res: Response) {
+
+      await this.userService.deleteUser(userId);
+
+      res.status(StatusCodes.NO_CONTENT).send();}    try {
+
+    } catch (error) {
+
+      if (error instanceof AppError) {      const { uid } = (req as any).user;
+
+        res.status(error.statusCode).json({ error: error.message });
+
+      } else {export async function createUserProfile(req: Request, res: Response): Promise<void> {      const updates = req.body;
+
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
+
+      }  try {      
+
+    }
+
+  };    const { uid, displayName, email } = req.body;      // Prevent updating sensitive fields
+
+}
+    if (!uid || !displayName || !email) {      delete updates.uid;
+
+      throw new AppError('Missing required fields: uid, displayName, email', 400);      delete updates.email;
+
+    }      delete updates.role;
+
+      delete updates.createdAt;
+
+    const newProfile: IUserProfile = {      delete updates.password;
+
+      uid,      
+
+      displayName,      // Validate update data
+
+      email,      if (updates.displayName && (
+
+      createdAt: new Date(),        typeof updates.displayName !== 'string' ||
+
+      updatedAt: new Date()        updates.displayName.length < 2 ||
+
+    };        updates.displayName.length > 50
+
+      )) {
+
+    const profile = await userRepo.create(newProfile);        throw new AppError('Invalid display name', 400, 'INVALID_DISPLAY_NAME');
+
+    res.status(201).json(profile);      }
+
+  } catch (error) {
+
+    const statusCode = error instanceof AppError ? error.statusCode : 500;      if (updates.photoURL && (
+
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred';        typeof updates.photoURL !== 'string' ||
+
+    res.status(statusCode).json({ error: message });        !updates.photoURL.match(/^https?:\/\/.+/)
+
+  }      )) {
+
+}        throw new AppError('Invalid photo URL', 400, 'INVALID_PHOTO_URL');
+
+      }
+
+export async function updateUserProfile(req: Request, res: Response): Promise<void> {
+
+  try {      // Add metadata
+
+    const { uid } = req.params;      updates.updatedAt = new Date();
+
+    if (!uid) {
+
+      throw new AppError('User ID is required', 400);      const userRepo = RepositoryFactory.getUserRepository();
+
+    }      const updatedProfile = await userRepo.update(uid, updates);
+
+      
+
+    const updates = { ...req.body, updatedAt: new Date() };      if (!updatedProfile) {
+
+    delete updates.uid; // Prevent uid modification        throw new AppError('Profile update failed', 400, 'UPDATE_FAILED');
+
+    delete updates.createdAt; // Prevent creation date modification      }
+
+      
+
+    const success = await userRepo.update(uid, updates);      // Remove sensitive information
+
+    if (!success) {      const { password, ...safeProfile } = updatedProfile;
+
+      res.status(404).json({ message: 'User profile not found' });      
+
+      return;      res.json({
+
+    }        status: 'success',
+
+        message: 'Profile updated successfully',
+
+    res.json({ success: true });        data: safeProfile
+
+  } catch (error) {      });
+
+    const statusCode = error instanceof AppError ? error.statusCode : 500;    } catch (error) {
+
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred';      if (error instanceof AppError) {
+
+    res.status(statusCode).json({ error: message });        throw error;
+
+  }      }
+
+}      throw new AppError('Failed to update profile', 500, 'UPDATE_ERROR');
+
+    }
+
+export async function getActiveUserSessions(req: Request, res: Response): Promise<void> {  },
+
+  try {
+
+    const { uid } = req.params;  async deleteProfile(req: Request, res: Response) {
+
+    if (!uid) {    try {
+
+      throw new AppError('User ID is required', 400);      const { uid } = (req as any).user;
+
+    }      const userRepo = RepositoryFactory.getUserRepository();
+
+      
+
+    // For now, just return empty array as this is a placeholder for future functionality      // Delete user's data
+
+    res.json([]);      await Promise.all([
+
+  } catch (error) {        userRepo.delete(uid),
+
+    const statusCode = error instanceof AppError ? error.statusCode : 500;        // Add other cleanup tasks here (e.g., delete user's plants, etc.)
+
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred';      ]);
+
+    res.status(statusCode).json({ error: message });
+
+  }      res.json({
+
+}        status: 'success',
+        message: 'Profile deleted successfully'
+      });
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      throw new AppError('Failed to delete profile', 500, 'DELETE_ERROR');
+    }
+  },
+
+  async getPreferences(req: Request, res: Response) {
+    try {
+      const { uid } = (req as any).user;
+      const userRepo = RepositoryFactory.getUserRepository();
+      const profile = await userRepo.findByUid(uid);
+      
+      if (!profile) {
+        throw new AppError('Profile not found', 404, 'PROFILE_NOT_FOUND');
+      }
+      
+      res.json({
+        status: 'success',
+        data: profile.preferences || {}
+      });
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      throw new AppError('Failed to get preferences', 500, 'FETCH_ERROR');
+    }
+  },
+
+  async updatePreferences(req: Request, res: Response) {
+    try {
+      const { uid } = (req as any).user;
+      const preferences = req.body;
+      
+      if (!preferences || typeof preferences !== 'object') {
+        throw new AppError('Invalid preferences data', 400, 'INVALID_PREFERENCES');
+      }
+
+      const userRepo = RepositoryFactory.getUserRepository();
+      const success = await userRepo.updatePreferences(uid, preferences);
+      
+      if (!success) {
+        throw new AppError('Failed to update preferences', 400, 'UPDATE_FAILED');
+      }
+      
+      res.json({
+        status: 'success',
+        message: 'Preferences updated successfully',
+        data: preferences
+      });
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      throw new AppError('Failed to update preferences', 500, 'UPDATE_ERROR');
+    }
+  }
+};

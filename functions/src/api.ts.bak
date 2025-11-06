@@ -1,0 +1,253 @@
+import { Request, Response } from 'express';
+import * as functions from 'firebase-functions';
+import { ObjectId } from 'mongodb';
+import * as dbService from './models/db-service';
+import { auth } from 'firebase-admin';
+import { AppError, ValidationError, AuthError } from './errors';
+
+// Type for authenticated request
+interface AuthRequest extends Request {
+  uid?: string;
+}
+
+// Utility function to handle API errors
+function handleApiError(error: unknown, res: functions.Response<any>): void {
+  if (error instanceof AppError) {
+    res.status(error.status).json({
+      error: error.message,
+      code: error.code,
+      ...(error.details && { details: error.details })
+    });
+  } else {
+    console.error('Unexpected error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+}
+
+// Request validation utility
+function validateRequired(data: Record<string, any>, fields: string[]): void {
+  const missing = fields.filter(field => data[field] === undefined || data[field] === null);
+  if (missing.length > 0) {
+    throw new ValidationError(
+      `Missing required fields: ${missing.join(', ')}`,
+      { fields: missing }
+    );
+  }
+}
+import { DatabaseError } from './models/db-service';
+
+// Type for the response object from Cloud Functions
+type CloudFunctionsResponse = functions.Response<any>;
+
+// Error handler utility
+function handleApiError(error: unknown, res: CloudFunctionsResponse): void {
+  if (error instanceof AppError) {
+    res.status(error.status).json({
+      error: error.message,
+      code: error.code,
+      ...(error.details && { details: error.details })
+    });
+  } else if (error instanceof Error) {
+    console.error('Unexpected error:', error);
+    res.status(500).json({
+      error: error.message,
+      code: 'INTERNAL_ERROR'
+    });
+  } else {
+    console.error('Unknown error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+}
+
+// Request validation utility
+function validateRequired(data: Record<string, any>, fields: string[]): void {
+  const missing = fields.filter(field => data[field] === undefined || data[field] === null);
+  if (missing.length > 0) {
+    throw new ValidationError(`Missing required fields: ${missing.join(', ')}`);
+  }
+}
+
+// Authentication middleware
+const authenticate = async (req: functions.https.Request): Promise<string> => {
+  const authorization = req.headers.authorization;
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    throw new functions.https.HttpsError('unauthenticated', 'No token provided');
+  }
+
+  try {
+    const token = authorization.split('Bearer ')[1];
+    const decodedToken = await auth().verifyIdToken(token);
+    return decodedToken.uid;
+  } catch (error) {
+    throw new functions.https.HttpsError('unauthenticated', 'Invalid token');
+  }
+};
+
+// User Profile Endpoints
+export const getUserProfile = functions.https.onRequest(async (req, res) => {
+  try {
+    const uid = await authenticate(req);
+    const profile = await dbService.getUserProfile(uid);
+    res.json(profile);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+export const updateUserProfile = functions.https.onRequest(async (req, res) => {
+  try {
+    const uid = await authenticate(req);
+    const updates = req.body;
+    const success = await dbService.updateUserProfile(uid, updates);
+    res.json({ success });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Plant Endpoints
+export const searchPlants = functions.https.onRequest(async (req, res) => {
+  try {
+    await authenticate(req);
+    const { query } = req.query;
+    if (!query || typeof query !== 'string') {
+      throw new Error('Invalid query parameter');
+    }
+    const plants = await dbService.searchPlants(query);
+    res.json(plants);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Garden Endpoints
+export const getUserGarden = functions.https.onRequest(async (req, res) => {
+  try {
+    const uid = await authenticate(req);
+    const garden = await dbService.getUserGarden(uid);
+    res.json(garden);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+export const addPlantToGarden = functions.https.onRequest(async (req, res) => {
+  try {
+    const uid = await authenticate(req);
+    const { plantId, location, notes } = req.body;
+    
+    if (!plantId || !location) {
+      throw new Error('Missing required parameters');
+    }
+
+    const success = await dbService.addPlantToGarden(
+      uid,
+      new ObjectId(plantId),
+      location,
+      notes
+    );
+    res.json({ success });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+export const updatePlantInGarden = functions.https.onRequest(async (req, res) => {
+  try {
+    const uid = await authenticate(req);
+    const { plantId, updates } = req.body;
+    
+    if (!plantId || !updates) {
+      throw new Error('Missing required parameters');
+    }
+
+    const success = await dbService.updatePlantInGarden(
+      uid,
+      new ObjectId(plantId),
+      updates
+    );
+    res.json({ success });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Plant Identification Endpoints
+export const savePlantIdentification = functions.https.onRequest(async (req, res) => {
+  try {
+    const uid = await authenticate(req);
+    const identificationData = {
+      ...req.body,
+      userId: uid,
+      identifiedAt: new Date()
+    };
+    
+    const identification = await dbService.savePlantIdentification(identificationData);
+    res.json(identification);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+export const getUserPlantIdentifications = functions.https.onRequest(async (req, res) => {
+  try {
+    const uid = await authenticate(req);
+    const identifications = await dbService.getUserPlantIdentifications(uid);
+    res.json(identifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Environmental Data Endpoints
+export const saveEnvironmentalData = functions.https.onRequest(async (req, res) => {
+  try {
+    const uid = await authenticate(req);
+    const environmentalData = {
+      ...req.body,
+      userId: uid,
+      timestamp: new Date()
+    };
+    
+    const savedData = await dbService.saveEnvironmentalData(environmentalData);
+    res.json(savedData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+export const getLatestEnvironmentalData = functions.https.onRequest(async (req, res) => {
+  try {
+    const uid = await authenticate(req);
+    const data = await dbService.getLatestEnvironmentalData(uid);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+export const getEnvironmentalDataHistory = functions.https.onRequest(async (req, res) => {
+  try {
+    const uid = await authenticate(req);
+    const { startDate, endDate } = req.query;
+    
+    if (!startDate || !endDate) {
+      throw new Error('Missing date parameters');
+    }
+
+    const history = await dbService.getEnvironmentalDataHistory(
+      uid,
+      new Date(startDate as string),
+      new Date(endDate as string)
+    );
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
